@@ -1,57 +1,45 @@
 ---
 svcdesk_decisions:
-  C1: wallclock      # wallclock | business
-  C2: immutable      # reopen | immutable
-  C3: vip            # matrix | vip
+  C1: wallclock
+  C2: immutable
+  C3: vip
 ---
-<!-- ai-generated: ??% - TODO: replace ?? with your estimate and say how AI was used (the advisory flags this line until you do) -->
+<!-- ai-generated: 100% - drafted with ChatGPT based on the selected Lab 1 decisions and reviewed by the student -->
 
 # Decisions
 
-<!--
-How to fill this in (delete this comment when you are done):
-- The three values in the front matter must be the ones your RUNNING service exhibits. The checker probes the
-  service (checks 2.41, 2.35, 2.46) and compares them with this file (L1-CORE-4).
-- Keep the three headings starting with "## C1", "## C2", "## C3" and the five bold labels in each section. Write
-  at least 20 characters after every label; the lecturer reads this document, so write what you would say to
-  the service owner, not the minimum.
-- "Service owner": the role (never a person's name) who would sign this decision off, and why it is theirs.
-- "Customer outcome": what the reporter or the organisation gets from this choice, in one or two sentences.
-- Update the ai-generated line above to say how much of this text an AI wrote and how.
--->
-
 ## C1 - SLA clock for P1
 
-**Decision:** TODO
+**Decision:** P1 acknowledgement and resolution targets use the wall-clock model, so their SLA timers continue running outside normal business hours.
 
-**Rejected alternative:** TODO
+**Rejected alternative:** The rejected alternative was the business-hours model, where P1 SLA timers would pause outside the defined service desk business hours.
 
-**Reason:** TODO
+**Reason:** P1 tickets represent the most critical incidents, therefore their acknowledgement and resolution targets should continue running regardless of evenings or weekends.
 
-**Service owner:** TODO
+**Service owner:** The Service Desk product owner should approve this decision because this role is responsible for defining SLA expectations and handling critical incidents.
 
-**Customer outcome:** TODO
+**Customer outcome:** Users reporting critical P1 incidents receive a continuous SLA commitment, ensuring that high-impact problems remain urgent regardless of when they occur.
 
 ## C2 - Closed tickets and reopening
 
-**Decision:** TODO
+**Decision:** Closed tickets are immutable and cannot be reopened. Further work on the same issue requires creating a new ticket referencing the previous ticket.
 
-**Rejected alternative:** TODO
+**Rejected alternative:** The rejected alternative was allowing closed tickets to be reopened within seven days and returned to the in-progress state.
 
-**Reason:** TODO
+**Reason:** Keeping closed tickets immutable provides a clear and reliable ticket history and ensures that closing a ticket represents a final lifecycle state.
 
-**Service owner:** TODO
+**Service owner:** The Service Desk product owner should approve this decision because this role is responsible for ticket lifecycle rules, reporting and service desk governance.
 
-**Customer outcome:** TODO
+**Customer outcome:** Customers receive a clear history of completed work, while recurring issues can still be tracked through new tickets linked to the original ticket.
 
 ## C3 - VIP reporters and the priority matrix
 
-**Decision:** TODO
+**Decision:** The normal priority matrix is applied first, but VIP tickets calculated as P3 or P4 are promoted to P2 while P1 and P2 remain unchanged.
 
-**Rejected alternative:** TODO
+**Rejected alternative:** The rejected alternative was using only the impact and urgency matrix, where the VIP flag would be stored but would not influence ticket priority.
 
-**Reason:** TODO
+**Reason:** Promoting lower-priority VIP tickets to P2 increases their visibility to the service desk without overriding genuinely critical P1 incidents.
 
-**Service owner:** TODO
+**Service owner:** The Service Desk product owner should approve this decision because this role is responsible for prioritisation rules and operational response expectations.
 
-**Customer outcome:** TODO
+**Customer outcome:** VIP reporters receive increased visibility for their lower-priority issues while the standard priority matrix continues to identify genuinely critical incidents.
