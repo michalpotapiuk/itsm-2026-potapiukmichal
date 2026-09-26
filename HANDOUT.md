@@ -1,228 +1,200 @@
 <!-- ai-generated: 0% - written by the course team -->
-# Lab 1 - Build `svcdesk` from a contradictory specification
+# Lab 2 - Measure your own delivery, and prove the metrics are gameable
 
-Saturday 19 September 2026, 150 minutes, fully online. AI Assessment Scale level 4 (Full AI). Peak container RAM
-about 0.4 GB.
+Saturday 26 September 2026, 150 minutes, fully online. AI Assessment Scale level 3 (AI-assisted). Peak container
+RAM about 0.5 GB.
 
 Disclosure: reasoning artifacts are pre-screened by an AI model; all grades are assigned by the lecturer.
 
 ## Goal
 
-Build the service-desk API `svcdesk` that the whole semester runs on, from a requirements document that contains
-three pairs of requirements that cannot both hold. The service must pass the published conformance checks, and
-`DECISIONS.md` must declare and defend the way you resolved each pair, matching what your running service actually
-does. A single prompt produces code; it cannot produce a decision about which requirement to break and why. That
-decision, defended in writing, is the work of this lab.
+Add two endpoints to the `svcdesk` you built in Lab 1: one that computes DORA's five delivery metrics from a
+supplied event log, and one that exports your own tickets as a lifecycle stream. Then demonstrate Goodhart's law
+with arithmetic attached - a change to the event log that **improves** at least one of the five metrics while
+making delivery **measurably worse**.
 
-Read, in this order: [REQUIREMENTS.md](REQUIREMENTS.md) (what the desk wants), [API.md](API.md) (the exact HTTP
-contract), [CHECKS.md](CHECKS.md) (every check the checker runs), [DECISIONS-template.md](DECISIONS-template.md)
-(the shape of your reasoning artifact). `./itsmlab.sh checks 1` prints the same catalogue from the checker itself,
-and `--markdown` prints exactly `CHECKS.md`; it runs nothing, so it is safe at any point in the lab. The course
-[README](../README.md) explains the checker, the receipts and the deadlines.
+The rules are published in full. The data is not. An assistant will give you five metric definitions in one
+prompt, and they will be right about the easy cases and wrong about six specific ones that are in the log on
+purpose. Applying the specification to messy data is the work of this lab.
+
+Read, in this order: [METRIC-SPEC.md](METRIC-SPEC.md) (the whole rulebook - metrics, edge cases, tolerances,
+margins), [CHECKS.md](CHECKS.md) (every check the checker runs), and the two templates,
+[EDGE-CASES-template.md](EDGE-CASES-template.md) and [gaming-template.json](gaming-template.json).
+`./itsmlab.sh checks 2` prints the same catalogue from the checker itself; it runs nothing, so it is safe at any
+point in the lab. The course [README](../README.md) explains the checker, the receipts and the deadlines.
+
+## If you have not finished Lab 1
+
+Finish it first. Lab 2 adds two endpoints to the `svcdesk` you built in Lab 1, so you need that service
+running before any of this lab makes sense; there is no checkpoint to adopt for Lab 2.
+
+This costs you nothing, because **Lab 1's correction window now closes on Sunday 27 September at 23:59:59**,
+not at the start of today's session. So: finish Lab 1 today, receipt it by Sunday evening and collect its
+marks, then do Lab 2 against your own service. Lab 2's own attempt 1 is due the same Sunday, and its
+correction window runs until **Saturday 10 October at 08:00**, which is the room you have for it.
+
+Leave `baselines:` in `itsmlab.yaml` as `{}`, or declare `lab1: student`; nothing in Lab 2 reads it yet.
+
+## Before you start
+
+Pull the current checker image and check its version:
+
+    docker pull ghcr.io/swasik/itsmlab:2026
+    ./itsmlab.sh --version                  # Windows: .\itsmlab.ps1 --version
+
+It must print `itsmlab 0.3.1` or newer. An image pulled before 25 September does not know Lab 2, so
+`checks 2` and `verify 2` fail with it. Your repository itself does not change.
 
 ## Minute budget
 
 Core items sum to 110 minutes; the remaining 40 are slack. If an item overruns by more than its budget, stop, run
 the checker, and ask on the forum with the check id.
 
+**Before item 1**, copy this folder's `fixtures/` directory into your repository root. You need the practice
+log locally to compute `metrics.json` and to build `gaming/after.jsonl`; the checker uses its own copy, so
+editing yours changes nothing it checks.
+
 | # | Core item | minutes | at |
 |---|---|---|---|
-| 1 | Read REQUIREMENTS.md, API.md and CHECKS.md; write down the three conflicting pairs and what each check accepts | 15 | 15 |
-| 2 | Constitution and specification (spec-kit or by hand) under `specs/`; push; obtain the `specs` receipt | 20 | 35 |
-| 3 | `DECISIONS.md`: three decisions, five labels each, values matching what you will build | 15 | 50 |
-| 4 | Plan and tasks (spec-kit `plan` and `tasks`, or a list by hand) | 10 | 60 |
-| 5 | Implement: `/health`, ticket create / get / list, validation, priority | 15 | 75 |
-| 6 | Implement: state machine, reopen window, test clock | 10 | 85 |
-| 7 | Implement: SLA due instants on both clocks (the eight vectors), `/sla` breach and pause | 15 | 100 |
-| 8 | Run the checker until every Core spec passes; tag; obtain the `submission` receipt | 10 | 110 |
+| 1 | Read `METRIC-SPEC.md`; open `fixtures/events-practice.jsonl` and find the six edge cases by eye | 10 | 10 |
+| 2 | `POST /dora/metrics`: parse and validate the log, apply the window, compute the five metrics | 30 | 40 |
+| 3 | The six edge-case rules, until `metrics-practice.json` matches field for field | 25 | 65 |
+| 4 | `GET /dora/ticket-events` | 10 | 75 |
+| 5 | `EDGE-CASES.md`: six sections, and the counts your own service reports | 15 | 90 |
+| 6 | The gaming demonstration: `gaming/after.jsonl`, `gaming.json` and the `## Gaming demonstration` section of `EDGE-CASES.md` | 15 | 105 |
+| 7 | Write `metrics.json`, run `./itsmlab.sh verify 2`, tag, submit | 5 | 110 |
 | | slack | 40 | 150 |
 
-Item 2 comes before item 5 for a reason: Core spec L1-CORE-5 requires your specs to be receipted before any file
-under `src/` is committed. Do not write code first and specs later; the receipts record the order.
+Item 3 is the one that overruns. When it does, run `./itsmlab.sh verify 2` and read which check fails: each of
+`L2-CORE-3.12` to `L2-CORE-3.14` names the anomaly and the rule, and that is usually enough to find which edge
+case you got wrong.
 
-## The three conflicts
+## The six edge cases
 
-From the course design, quoted so that there is no ambiguity about the rules:
+They are the reason this lab is not a one-prompt lab. Each one is covered by a published rule, and each one
+defeats a definition that models reliably emit:
 
-> The document contains three pairs of requirements that cannot both hold; each conflict is resolved by rejecting
-> the minimal conflicting part of one requirement and keeping everything else in the pair, which is why both sides
-> of each pair are still tested; the published checks (`CHECKS.md`) show the admissible outcomes, so the pairs are
-> discoverable by reading. Each contradiction has exactly two admissible resolutions; the checker accepts any of the
-> eight combinations, provided `DECISIONS.md` declares the one the running service exhibits and defends it.
+| id | what the log contains | the default that fails | the rule |
+|---|---|---|---|
+| E1 | a commit timestamped **after** the deployment that shipped it (clock skew) | drop the pair, or report a negative median | R-08 |
+| E2 | a commit that reverts a commit that is itself a revert | three commits, three changes | R-06 |
+| E3 | a hotfix deployed straight to production, never on `main` | filter commits on `branch == "main"` | R-09 |
+| E4 | a production deployment with **no** linked commits | drop the deployment, or divide by zero | R-10 |
+| E5 | a deployment that failed and never recovered | close it at the window's end, or drop it | R-12 |
+| E6 | incidents whose intervals overlap | merge them, or sum their wall-clock | R-13 |
 
-The three decisions are named C1 (SLA clock for P1), C2 (closed tickets and reopening) and C3 (VIP reporters and
-the priority matrix). Their admissible values are in the template's front matter and in API.md. Which requirements
-form each pair, which part you reject, and why, is yours to work out and to write down. There is no correct
-resolution, only defended ones; the grade does not depend on which side you pick.
+All six are in the practice fixture **and** in the graded one. What differs between the two is the data, never
+the rules.
+
+A useful way to spend ten minutes: ask your assistant for the five DORA metric definitions **before** you read
+`METRIC-SPEC.md`, keep its answer, and then mark it up against the six rules. It is the cheapest possible
+demonstration of the point Lecture 2 makes about where AI helps and where it confidently does not, and it costs
+you nothing if the answer turns out to be right.
 
 ## Core specs (all must pass; no partial credit inside the bundle)
 
 | spec | what it checks |
 |---|---|
-| L1-CORE-1 `compose-up` | the compose contract: a service `svcdesk` built from your repository (`build:`, never `image:` alone), no bind mounts in the resolved configuration, `docker compose up --wait` and `/health` within 120 s |
-| L1-CORE-2 `conformance` | 49 HTTP checks: health, validation, the priority matrix, the state machine, the reopen window, the SLA vectors, breach and pause, the test clock |
-| L1-CORE-3 `decisions-structure` | `DECISIONS.md` has the front matter, admissible values, three sections, five labels with at least 20 characters each |
-| L1-CORE-4 `decisions-consistency` | the values declared in `DECISIONS.md` equal the ones the checker observed on your running service (checks 2.41, 2.35, 2.46) |
-| L1-CORE-5 `spec-first` | grader-only: a `specs` receipt exists whose commit is an ancestor of the submission, and every commit adding a file under `src/` (other than `src/README.md`) descends from it. Tier A reports it as `skip`; Tier B checks it from the receipts |
+| `L2-CORE-1` `compose-up` | your service still builds and answers `GET /health` |
+| `L2-CORE-2` `dora-api` | the endpoint contract: shape, purity, order independence, duplicate events, empty log, four rejections, and `GET /dora/ticket-events` |
+| `L2-CORE-3` `metrics-practice` | the five metrics, every count and every anomaly for the practice fixture, plus `metrics.json` |
+| `L2-CORE-4` `edge-cases` | `EDGE-CASES.md`, and **the consistency gate**: the counts you declared must equal what your own service reports |
+| `L2-CORE-5` `gaming` | conservation, both re-derived metric objects, and the two margins |
+| `L2-CORE-6` `prediction-order` | Tier B only; passes vacuously if you do not attempt the METR stretch |
+
+**The consistency gate is the heart of the lab**, as `DECISIONS.md` was in Lab 1: you may not declare one thing
+and ship another. If your service says three negative-lead-time pairs, `EDGE-CASES.md` says three.
 
 ## Stretch (any two of three; each lifts the grade band equally)
 
-| option | what it checks |
+| spec | what it is |
 |---|---|
-| S1 `converge-report` | a file `specs/**/converge*.md` or `CONVERGE.md` of at least 400 characters that mentions at least three distinct requirement ids `R-nn`, all within R-01..R-25: the comparison the spec-kit `converge` step prints, saved by you to that file (the step does not write it, see "AI usage"), or your own written comparison of the specification with what was built |
-| S2 `agent-config` | `CLAUDE.md`; at least one `.claude/agents/*.md` sub-agent whose front matter has a `disallowedTools` list of at least three entries; `AGENT-POLICY.md` with one line per entry, `- <entry verbatim>: <justification of at least 20 characters>`, each a blast-radius decision. The course calls this a narrow allowlist; technically `disallowedTools` is a denylist: you name what the agent may never do |
-| S3 `own-tests` | a compose service `tests` under `profiles: ["tests"]`; `docker compose --profile tests run --rm --build tests` exits 0 within 300 s (both tiers; killed after that) and its last stdout line is `ITSMLAB-TESTS: passed=<n> failed=0` with n at least 10: your own suite against your own service, read from `SVCDESK_URL`; the tests image is built before the grader blocks egress, so it too installs everything at build time |
+| `L2-STRETCH-1` `metr-n1` | An n=1 METR self-replication. Predict, in `PREDICTION.md`, how long a named feature will take - then **receipt the prediction before the feature's first commit** - build it, and record the outcome in `METR.md` with the ratio actual/predicted to two decimals. **Direction-neutral**: a speedup and a slowdown score identically. What is graded is that the prediction came first and was measured honestly. |
+| `L2-STRETCH-2` `rework-class` | Compute the deployment rework rate over the class's shared repository history with `gh api`. Commit the captured payload, and record `source`, `captured_at`, `capture_path`, `sha256`, `deployments`, `rework_deployments` and `deployment_rework_rate` in `rework-class.json`. The checker re-derives the rate from your two counts and checks the payload's digest. |
+| `L2-STRETCH-3` `own-tests` | Your own pytest suite behind the compose `tests` profile, as in Lab 1: exit 0 within 300 s and a last line `ITSMLAB-TESTS: passed=<n> failed=0` with n at least 10. |
 
-An example for S2, from the reference layout: `disallowedTools: [Bash(rm *), Bash(git push *), Bash(docker *), WebFetch]`
-in `.claude/agents/reviewer.md`, and in `AGENT-POLICY.md` a line `- Bash(rm *): the reviewer reads and comments; deleting files is the author's decision, not the reviewer's`.
+There is no Kubernetes track in this lab.
 
 ## AI usage
 
-| Core AI step | default | free alternative (no card) | without AI |
-|---|---|---|---|
-| the spec-kit chain (constitution, specify, plan, tasks, implement) | Claude Code | Gemini CLI, GitHub Copilot Free | specs and code written by hand |
+Free choice of tool; this is AIAS level 3. Claude Pro is **not** required and is never on the Core path: Gemini
+CLI (free tier, no card), GitHub Copilot Free, a local Ollama model or no AI at all all reach the same grade
+bands.
 
-Claude Pro is never required. All three columns reach the same grade bands; the checks do not know which you used.
-Claude Code on the web solves hardware, not quota: it draws on the same account's limits. If your quota is low at
-the start of the session (run `/usage` in Claude Code), switch to the free alternative now, not at minute 100.
-Quota exhaustion is never a reason for a deadline extension.
-
-This is the lab where AI does the most work, on purpose: it sets the baseline the rest of the semester measures
-against. AIAS level 4 means you may use AI for any part of the work; you must disclose it (the header below), and
-you remain responsible for every line and every decision.
-
-spec-kit, if you use it (the `--integration` value is `claude`, `gemini` or `copilot`; run it in your repository):
-
-    uvx --from git+https://github.com/github/spec-kit.git@v1.0.6 specify init --here --integration claude
-
-It asks `Do you want to continue? [y/N]` because the repository is not empty: answer `y` (or add `--force`). It
-only adds `.claude/` (or `.gemini/`, `.github/` for the other integrations) and `.specify/`; nothing from the
-template is overwritten. Commit those directories.
-
-On Windows it also asks `Choose script type (or press Enter)`: press Enter to keep `ps`, the PowerShell scripts
-that run in the Windows PowerShell you already have. They run only after the execution policy of PREWORK.md
-step 2 (`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`). If `init` stops with `claude not found` because
-you use Claude Code through the Desktop app or an editor extension rather than the `claude` command, add
-`--ignore-agent-tools`.
-
-The command names depend on the integration: Claude Code and Copilot get skills named with a hyphen, Gemini CLI
-gets commands named with a dot (`.gemini/commands/speckit.*.toml`, as its `init` output says):
-
-| step | Claude Code, Copilot | Gemini CLI |
-|---|---|---|
-| constitution | `/speckit-constitution` | `/speckit.constitution` |
-| specify | `/speckit-specify` | `/speckit.specify` |
-| plan | `/speckit-plan` | `/speckit.plan` |
-| tasks | `/speckit-tasks` | `/speckit.tasks` |
-| implement | `/speckit-implement` | `/speckit.implement` |
-| converge (S1) | `/speckit-converge` | `/speckit.converge` |
-
-Run the chain in two halves, because the `specs` receipt sits between them (L1-CORE-5):
-
-1. Before any code: constitution and specify. Feed the agent REQUIREMENTS.md and API.md; spec-kit writes
-   `specs/<nnn>-<feature>/spec.md`, which is what the `specs` receipt looks for. Then **stop**: commit `specs/`
-   (with `.specify/` and `.claude/`, `.gemini/` or `.github/`), push `main`, and obtain the `specs` receipt
-   (steps 1 and 2 of "Submission, receipts and attempts" below). Plan and tasks may come before or after the
-   receipt: they write under `specs/`, never under `src/`.
-2. After the receipt comment has appeared: plan, tasks, implement, and for S1 converge.
-
-S1 needs a file that the converge step does not write. In the pinned spec-kit, `/speckit-converge`
-(`/speckit.converge`) prints its comparison of the specification with the implementation in the conversation
-and at most appends remediation tasks to `tasks.md`; when everything converges it writes nothing, and S1 fails
-with `no file matching specs/**/converge*.md or CONVERGE.md`. So, after it has run, save the comparison: ask the
-agent to write it to `specs/converge.md` with at least 400 characters and the ids of at least three
-requirements it checked (R-01..R-25), or write that file yourself without spec-kit. The check reads only the
-file.
-
-## Rules
-
-- **No network at run time.** Your image installs its dependencies at build time. The grading sandbox has no
-  network once the image is built; a service that pulls anything at start fails L1-CORE-1.
-- **Build, do not pull.** `svcdesk` must have a `build:` key; a service that only names an `image:` fails 1.01,
-  because the Core bundle is earned by the code in your repository (your Dockerfile may start `FROM` any base).
-- **No bind mounts.** No `./x:/y`, `/x:/y` or `type: bind` volumes on any service, in override files or through
-  `.env` either (the check reads the resolved configuration). The checker runs `docker compose` from inside a
-  container, where your host paths do not exist. Named volumes and `tmpfs` are fine.
-- **Specs before code.** The `specs` receipt first; only then files under `src/`.
-- **Tags never move.** Each attempt is a new tag (`lab1/v1`, `lab1/v2`, `lab1/v3`). A tag that moved after its
-  receipt voids the attempt, and the attempt still counts.
-- **No personal data in the repository**: no hostnames, no usernames, no `doctor` output. That goes to Moodle.
-- **Every source and specification file carries the AI-disclosure header** (the exact set is below).
+The interesting result of this lab is that an assistant confidently produces metric definitions that fail on the
+six traps. You are not graded on whether your assistant got them right or wrong - only on whether your service
+follows `METRIC-SPEC.md`.
 
 ## Deliverables
 
-A public GitHub repository created from the course template, at the receipted tag, containing:
+At the repository root, on the tag you submit:
 
-- `specs/`: the specification written before the code (at least one file of 500 bytes or more);
-- `src/`: the implementation, in any language;
-- `DECISIONS.md`: the three decisions, in the template's structure;
-- `docker-compose.yml`: the compose contract of API.md section 9;
-- a passing conformance run: the grader runs the checker itself; your reported result is not used.
+| path | what |
+|---|---|
+| `fixtures/` | the practice log and its published expectations, copied from this folder |
+| `metrics/` (or wherever your code lives) | the metric computation |
+| `metrics.json` | the metric object for the practice fixture, as **your** service returns it |
+| `EDGE-CASES.md` | six sections, six declared counts, front matter as the template shows, and a final `## Gaming demonstration` section (your gaming write-up) |
+| `gaming/after.jsonl` | the transformed event log |
+| `gaming.json` | `metric`, `rule`, `before`, `after` |
+| `PREDICTION.md`, `METR.md` | Stretch 1 only |
+| `rework-class.json` + the captured payload | Stretch 2 only |
 
 ## Submission, receipts and attempts
 
-The complete path, in order. Every command runs in your repository root: bash on Linux and macOS, PowerShell
-on Windows (`.\itsmlab.ps1` instead of `./itsmlab.sh`; `;` instead of `&&`).
+Same path as Lab 1; every command runs in your repository root (PowerShell users: `.\itsmlab.ps1`, `;` instead of
+`&&`).
 
-1. **Specs**: write `specs/` (nothing under `src/` yet), commit and push:
-   `git add -A && git commit -m "Lab 1 specs" && git push origin main`.
-2. **Specs receipt**: `./itsmlab.sh submit 1 --kind specs` (`.\itsmlab.ps1 submit 1 --kind specs`), open the
-   printed issue-form URL, submit the issue, wait for the bot's receipt comment (about a minute). Only then
-   start on `src/`.
-3. **Implement**: `DECISIONS.md`, plan, tasks, code; run `./itsmlab.sh verify 1` as often as you like.
-4. **Commit the implementation and push**: `git status` shows nothing to commit, otherwise
-   `git add -A && git commit -m "Lab 1 attempt 1"`; then `git push origin main`.
-5. **Verify the committed tree**: `./itsmlab.sh verify 1` exits 0, and its `commit` line does not say `(dirty)`.
-6. **Tag that commit and push the tag**: `git tag -a lab1/v1 -m "Lab 1 attempt 1"` and `git push origin lab1/v1`.
-   The tag must identify the same committed files that were verified: Tier B grades the tag's files, not your
-   working directory, and an implementation you verified but never committed is absent from the tag.
-7. **Submission receipt**: `./itsmlab.sh submit 1 --kind submission --tag lab1/v1` (`.\itsmlab.ps1 submit 1
-   --kind submission --tag lab1/v1`). It warns when the working tree has uncommitted changes or HEAD has moved
-   past the tag (then back to step 4, with the next tag name). Open the URL, submit the issue, keep the receipt.
-8. Three attempts. Attempt 1 is due Sunday 20 September 2026, 23:59:59 (Europe/Warsaw); that deadline is
-   advisory: a receipt after it is marked `after_attempt1_due` and still counts. Attempts 2 and 3 are the
-   correction window and must be receipted before the next session: the window closes **Saturday 26 September
-   2026 at 08:00:00 Europe/Warsaw**, when session 2 starts; a receipt after that instant is `late` and does not
-   count. The best attempt counts. Tier A runs are unlimited and never count.
-9. The grade arrives as a comment `itsmlab grade` on the same issue, usually within 20 minutes, with `grade.json`
-   and its Sigstore bundle; README section 6 says how to verify it.
+1. **If you attempt Stretch 1**, do this *first*: write `PREDICTION.md`, commit and push it, then
+   `./itsmlab.sh submit 2 --kind prediction`, open the printed issue-form URL, submit the issue, and wait for
+   the bot's receipt. With no `--text` the command files the contents of `PREDICTION.md`, and the receipt binds
+   the sha256 of exactly that, which is what the grader re-hashes: edit the file afterwards and the receipt no
+   longer matches it. Only then write the first line of that feature. The receipt binds the
+   hash of your prediction to the `main` SHA at that moment, and Tier B requires the feature's commits to descend
+   from it. Git author dates are never used, so back-dating a commit achieves nothing.
+2. **Implement**, running `./itsmlab.sh verify 2` as often as you like. Tier A runs are unlimited and never count.
+3. **Commit and push**: `git add -A && git commit -m "Lab 2 attempt 1" && git push origin main`.
+4. **Verify the committed tree**: `./itsmlab.sh verify 2` exits 0 and its `commit` line does not say `(dirty)`.
+5. **Tag and push the tag**: `git tag -a lab2/v1 -m "Lab 2 attempt 1"` and `git push origin lab2/v1`. Tier B
+   grades the tag's files, never your working directory.
+6. **Submission receipt**: `./itsmlab.sh submit 2 --kind submission --tag lab2/v1`. Open the URL, submit the
+   issue, keep the receipt.
+7. Three attempts. Attempt 1 is due Sunday 27 September 2026, 23:59:59 (Europe/Warsaw); that deadline is
+   advisory - a receipt after it is marked `after_attempt1_due` and still counts. Attempts 2 and 3 are the
+   correction window and close **Saturday 10 October 2026 at 08:00:00 Europe/Warsaw**, when session 3 starts; a
+   receipt after that instant is `late` and does not count. The best attempt counts.
+8. The grade arrives as a comment `itsmlab grade` on the same issue, usually within 20 minutes.
 
-Details, expected outputs and troubleshooting: the course [README](../README.md).
+## What the grader does that the checker cannot
+
+Tier A checks you against the **practice** fixture, whose expected values are published next to it - so you can
+see every failure before you submit. Tier B serves your service a **different log, generated from your own
+seed**, that nobody has ever seen, and compares your answer with values it computes from `METRIC-SPEC.md`
+itself. When a field mismatches there, the grade report names **the field and the rule** and never the expected
+value.
+
+A classmate's `metrics.json` is worthless to you: their log is not yours.
 
 ## The AI-disclosure header
 
-Every file under `src/` and `specs/` with extension `.py .go .ts .js .java .cs .rb .rs .kt .md`, plus
-`DECISIONS.md`, carries in its first ten lines a comment matching `ai-generated: <0-100>% - <one line on how>`:
+Every file under `src/`, `specs/` and `metrics/` with extension `.py .go .ts .js .java .cs .rb .rs .kt .md`, plus
+`DECISIONS.md` and `EDGE-CASES.md`, carries in its first ten lines a comment matching
+`ai-generated: <0-100>% - <one line on how>`:
 
-    # ai-generated: 80% - Claude Code drafted, I rewrote the SLA clock          (Python, Ruby)
-    // ai-generated: 0% - by hand                                               (Go, TypeScript, Java, ...)
-    <!-- ai-generated: 30% - outline by Gemini CLI, text mine -->               (Markdown)
+    # ai-generated: 70% - Gemini CLI wrote the parser, I wrote the six rules     (Python, Ruby)
+    // ai-generated: 0% - by hand                                                (Go, TypeScript, Java, ...)
+    <!-- ai-generated: 30% - outline by an assistant, text mine -->              (Markdown)
 
-That set (those extensions under `src/` and `specs/`, plus `DECISIONS.md`) is exactly what the checker reads;
-YAML, shell, Dockerfiles and `requirements.txt` are not checked and need no header. An otherwise empty
-`__init__.py` needs the one comment line too. In `DECISIONS.md` put it on the line right after the closing `---`
-of the front matter (the template does); the template's placeholder `ai-generated: ??% - TODO ...` is flagged by
-the advisory until you replace `??` with a number. The checker lists the files without it as an advisory; the
-course rules require it on every checked file. A single 400-line commit is not a failing artifact; it is an
-artifact whose checks will be looked at harder.
+In `EDGE-CASES.md` put it on the line right after the closing `---` of the front matter, as the template does:
+the front matter must be the first thing in the file. The checker lists files without the header as an advisory;
+the course rules require it on every checked file.
 
 ## Style of the written artifacts
 
-Plain prose. `DECISIONS.md` is read by the lecturer (after an AI pre-screen, see the disclosure line above) and
-graded on whether the reason is sound, the service owner is the right role, and the customer outcome named is the
-one the behaviour actually serves. No stories, no personas, no filler: say what you decided, what you gave up, and
-who bears the consequence.
-
-## Checklist before you submit
-
-- [ ] `./itsmlab.sh verify 1` exits 0 (every Core spec `pass`, L1-CORE-5 `skip`)
-- [ ] `DECISIONS.md` front matter values equal what the checker observed: the line `observations  C1=...  C2=...  C3=...` at the end of `verify 1`, the `observations` object of `report.json` (the Actions step summary calls it "Observed resolutions")
-- [ ] each of the five labels in each of the three sections carries real text (not `TODO`)
-- [ ] the `specs` receipt exists, and no commit under `src/` predates it
-- [ ] no bind mounts; the image needs no network at start
-- [ ] every file under `src/` and `specs/`, and `DECISIONS.md`, carries the `ai-generated:` header
-- [ ] `itsmlab.yaml` names your repository (`repository:`)
-- [ ] the implementation is committed and pushed, `git status` is clean, and the tag points at the commit that
-      `verify 1` reported (no `(dirty)`)
-- [ ] the tag is pushed, the submission issue is filed, the receipt comment has appeared
-- [ ] (Stretch) two of: converge report, agent config with `AGENT-POLICY.md`, `tests` profile with the summary line
+Plain prose. `EDGE-CASES.md`, including its final `## Gaming demonstration` section (your gaming write-up), is
+read by the lecturer (after an AI pre-screen, see the disclosure line above) and graded on whether you understood
+**why** the rule is the way it is - not on whether you can restate it. For each edge case, say what a default
+definition would have done and what that would have cost the person reading the dashboard. For the gaming
+demonstration, say which metric you improved and which rule you exploited (the same `metric` and `rule` as in
+`gaming.json`), which incentive would produce that change in a real team, and who would have been rewarded for
+it.
