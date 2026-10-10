@@ -1,0 +1,53 @@
+# ai-generated: 90% - ChatGPT prepared the Prometheus alert tests and calculated the first firing boundaries; I validated them locally with promtool.
+
+rule_files:
+  - alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{job="svcdesk", instance="svcdesk:8080", http_request_method="GET", http_route="/kb/search", http_response_status_code="200"}'
+        values: '0+600x60 36360+360x120'
+
+      - series: 'http_server_request_duration_seconds_count{job="svcdesk", instance="svcdesk:8080", http_request_method="GET", http_route="/kb/search", http_response_status_code="502"}'
+        values: '0x60 240+240x120'
+
+    alert_rule_test:
+      - eval_time: 1h26m
+        alertname: KbSearchErrorsBurnFast
+        exp_alerts: []
+
+      - eval_time: 1h27m
+        alertname: KbSearchErrorsBurnFast
+        exp_alerts:
+          - exp_labels:
+              service: svcdesk
+              slo: availability
+              severity: P1
+            exp_annotations:
+              summary: "Fast availability error-budget burn on /kb/search"
+
+  - interval: 1m
+    input_series:
+      - series: 'http_server_request_duration_seconds_count{job="svcdesk", instance="svcdesk:8080", http_request_method="GET", http_route="/kb/search", http_response_status_code="200"}'
+        values: '0+600x360 216360+360x300'
+
+      - series: 'http_server_request_duration_seconds_count{job="svcdesk", instance="svcdesk:8080", http_request_method="GET", http_route="/kb/search", http_response_status_code="502"}'
+        values: '0x360 240+240x300'
+
+    alert_rule_test:
+      - eval_time: 6h58m
+        alertname: KbSearchErrorsBurnSlow
+        exp_alerts: []
+
+      - eval_time: 6h59m
+        alertname: KbSearchErrorsBurnSlow
+        exp_alerts:
+          - exp_labels:
+              service: svcdesk
+              slo: availability
+              severity: P2
+            exp_annotations:
+              summary: "Sustained availability error-budget burn on /kb/search"

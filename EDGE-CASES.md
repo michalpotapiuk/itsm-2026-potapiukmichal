@@ -49,4 +49,10 @@ lab2_edge_cases:
 
 ## Gaming demonstration
 
-The gaming demonstration will use a permitted transformation of the practice log to improve one reported metric while making delivery of the original work measurably worse. The final explanation will be completed together with `gaming.json` and `gaming/after.jsonl`.
+I improved `deployment_frequency_per_day` using rule R-11 by adding additional empty production deployments while removing commit associations from the existing deployments.
+
+This increases the visible deployment frequency even though the delivery of the original work becomes substantially worse. The base changes are no longer recorded as successfully delivered, while the dashboard reports a higher deployment frequency.
+
+A real team could be incentivised to do this if management rewarded the number of production deployments without checking whether those deployments actually carried useful work. The team or manager measured against deployment frequency would appear more productive even though customers would receive less of the original work.
+
+This demonstrates why deployment frequency should not be interpreted in isolation. A metric can improve numerically while the underlying delivery outcome becomes worse.

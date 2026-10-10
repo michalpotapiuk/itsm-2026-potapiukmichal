@@ -1,0 +1,30 @@
+[
+  {
+    "name": "chat qwen3:1.7b",
+    "context": {
+      "trace_id": "0e7985471063838b9606b0a8a7b3b74e",
+      "span_id": "66cb6864d55fd2ee"
+    },
+    "kind": "SpanKind.CLIENT",
+    "attributes": {
+      "gen_ai.operation.name": "chat",
+      "gen_ai.request.model": "qwen3:1.7b",
+      "gen_ai.provider.name": "openai",
+      "server.address": "127.0.0.1",
+      "server.port": 11434,
+      "gen_ai.response.finish_reasons": [
+        "stop"
+      ],
+      "gen_ai.response.model": "qwen3:1.7b",
+      "gen_ai.response.id": "chatcmpl-166",
+      "gen_ai.usage.input_tokens": 18,
+      "gen_ai.usage.output_tokens": 250,
+      "openai.response.system_fingerprint": "fp_ollama"
+    },
+    "status": {
+      "status_code": "StatusCode.UNSET"
+    },
+    "start_time": 1791633350138861000,
+    "end_time": 1791633355280107000
+  }
+]

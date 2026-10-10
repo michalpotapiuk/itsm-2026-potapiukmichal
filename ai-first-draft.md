@@ -1,15 +1,15 @@
 ---
 lab3_first_draft:
-  source: ai                    # ai | instructor  (instructor = the no-AI path: the flawed ladder is your draft)
-  tool: "ChatGPT GPT-5.6 Sol, 10 October 2026"                     # TODO: the assistant and its model, where you used it, the date (required with ai)
-  ladder: [0.005, 0.01, 0.02, 0.03, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.35, 0.5, 0.75, 1.0, 1.5, 2.0]                    # TODO: the assistant's boundaries, in seconds, exactly as it gave them
-  verdict: TODO                 # confirmed (it resolves your p99, M-11) | refuted (it does not)
-  evidence: {p99_seconds: TODO, bucket: [TODO, TODO], relative_width: TODO}
+  source: ai
+  tool: "ChatGPT GPT-5.6 Sol, 10 October 2026"
+  ladder: [0.005, 0.01, 0.02, 0.03, 0.05, 0.075, 0.1, 0.15, 0.2, 0.25, 0.35, 0.5, 0.75, 1.0, 1.5, 2.0]
+  verdict: refuted
+  evidence: {p99_seconds: 0.146, bucket: [0.1, 0.15], relative_width: 0.342}
 lab3_flawed_ladder:
-  verdict: refuted              # the only admissible verdict (M-27); the evidence is yours to compute
-  evidence: {p99_seconds: TODO, bucket: [TODO, TODO], relative_width: TODO}
+  verdict: refuted
+  evidence: {p99_seconds: 0.146, bucket: [0.04, 0.5], relative_width: 3.151}
 ---
-<!-- ai-generated: ??% - TODO replace ?? with a number and say in one line how this file was written -->
+<!-- ai-generated: 80% - ChatGPT provided the first draft and helped calculate the verdict arithmetic; I validated it using my own load measurement -->
 
 # The assistant's first draft, and two verdicts
 
@@ -63,13 +63,20 @@ A slower alert could use a lower burn rate over longer windows and notify a chat
 
 ## Verdict on the draft ladder
 
-The arithmetic: the p99 you measured, the bucket of the draft ladder that holds it, its width relative to the p99,
-and what `histogram_quantile` could report from that bucket. Then the verdict in one sentence.
+The measured p99 was 0.146 s. In the assistant's original ladder this value falls in the bucket (0.10, 0.15]. The bucket width is 0.05 s, so its relative width is 0.05 / 0.146 = 0.342, or 34.2%.
+
+Because 34.2% is greater than the maximum allowed width of 20% of the measured p99, the assistant's original ladder does not resolve my p99 and is therefore refuted.
+
+Within this bucket, histogram_quantile could estimate the p99 anywhere between 0.10 s and 0.15 s depending on the observations inside the bucket. That interval is too wide for the required resolution around the measured tail latency.
 
 ## The draft alert rule
 
-What the assistant's alert rule would have done for your SLO, and what you kept of it in `prometheus/alerts.yml`.
+The assistant proposed a multiwindow burn-rate approach with a fast alert using a 14.4 burn rate over both a one-hour and a five-minute window. I kept the general idea of combining a long and a short window, because this avoids paging on a brief isolated spike while still detecting a sustained fast burn.
+
+The final alert thresholds and SLO objective will be based on the SLO defined in slo.md rather than copying the draft values blindly.
 
 ## Verdict on the instructor's flawed ladder
 
-The same arithmetic for `buckets-flawed.example.yml`: where its resolution is spent, and where your p99 is.
+The measured p99 was 0.146 s. In the instructor's flawed ladder this value falls in the bucket (0.04, 0.50]. The bucket width is 0.46 s, so its relative width is 0.46 / 0.146 = 3.151, or 315.1%.
+
+This is far above the allowed 20% width, so the flawed ladder is refuted. The ladder spends too little resolution around the observed slow mode of my service. For this p99, histogram_quantile could return a value anywhere inside a very wide interval from 0.04 s to 0.50 s, which would make the reported tail latency operationally imprecise.

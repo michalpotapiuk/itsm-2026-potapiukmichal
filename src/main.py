@@ -14,6 +14,14 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, StrictBool, StrictInt
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+
+from fastapi import Query
+from fastapi.responses import Response
+from prometheus_client import Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 
 # ---------------------------------------------------------------------------
@@ -1451,3 +1459,118 @@ def dora_ticket_events():
     )
 
     return events
+
+    # ---------------------------------------------------------------------------
+# Lab 3 - monitoring and knowledge-base search
+# ---------------------------------------------------------------------------
+
+KB_INDEX_URL = os.getenv("KB_INDEX_URL", "http://kb-index:8080")
+
+HTTP_REQUEST_DURATION = Histogram(
+    "http_server_request_duration_seconds",
+    "HTTP server request duration in seconds",
+    [
+        "http_request_method",
+        "http_route",
+        "http_response_status_code",
+    ],
+    buckets=(
+    0.005,
+    0.01,
+    0.02,
+    0.03,
+    0.05,
+    0.075,
+    0.1,
+    0.11,
+    0.12,
+    0.13,
+    0.14,
+    0.15,
+    0.16,
+    0.18,
+    0.2,
+    0.25,
+    0.35,
+    0.5,
+    0.75,
+    1.0,
+    1.5,
+    2.0,
+),
+)
+
+
+@app.middleware("http")
+async def prometheus_http_metrics(request: Request, call_next):
+    start = time.perf_counter()
+
+    try:
+        response = await call_next(request)
+        status_code = response.status_code
+        return response
+    except Exception:
+        status_code = 500
+        raise
+    finally:
+        if request.url.path != "/metrics":
+            route = request.scope.get("route")
+
+            if route is not None and getattr(route, "path", None):
+                route_label = route.path
+            else:
+                route_label = "unmatched"
+
+            HTTP_REQUEST_DURATION.labels(
+                http_request_method=request.method,
+                http_route=route_label,
+                http_response_status_code=str(status_code),
+            ).observe(time.perf_counter() - start)
+
+
+@app.get("/metrics")
+def metrics():
+    return Response(
+        content=generate_latest(),
+        media_type=CONTENT_TYPE_LATEST,
+    )
+
+
+@app.get("/kb/search")
+def kb_search(
+    q: str = Query(min_length=1, max_length=200),
+):
+    encoded_q = urllib.parse.urlencode({"q": q})
+    url = f"{KB_INDEX_URL}/search?{encoded_q}"
+
+    try:
+        with urllib.request.urlopen(url, timeout=3.0) as response:
+            if response.status != 200:
+                raise ApiError(
+                    502,
+                    "upstream_unavailable",
+                    "knowledge-base index is unavailable",
+                )
+
+            upstream_body = json.loads(
+                response.read().decode("utf-8")
+            )
+
+    except ApiError:
+        raise
+    except (
+        urllib.error.HTTPError,
+        urllib.error.URLError,
+        TimeoutError,
+        json.JSONDecodeError,
+    ):
+        raise ApiError(
+            502,
+            "upstream_unavailable",
+            "knowledge-base index is unavailable",
+        )
+
+    return {
+        "query": q,
+        "hits": upstream_body["hits"],
+    }
