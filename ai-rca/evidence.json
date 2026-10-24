@@ -1,0 +1,500 @@
+[
+  {
+    "name": "payment_internal",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_INTERNAL\",span_name=\"charge\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:31:23Z",
+    "result": []
+  },
+  {
+    "name": "payment_internal",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_INTERNAL\",span_name=\"charge\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "0.032113444444444444"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "payment_internal",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_INTERNAL\",span_name=\"charge\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "0.004166666666666667"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "payment_server",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:31:23Z",
+    "result": []
+  },
+  {
+    "name": "payment_server",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "0.032113444444444444"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "payment_server",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "0.004166666666666667"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_errors",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:31:23Z",
+    "result": []
+  },
+  {
+    "name": "checkout_errors",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "0.032113444444444444"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_errors",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "0.004166666666666667"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_payment",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_CLIENT\",span_name=\"oteldemo.PaymentService/Charge\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:31:23Z",
+    "result": []
+  },
+  {
+    "name": "checkout_payment",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_CLIENT\",span_name=\"oteldemo.PaymentService/Charge\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "0.032113444444444444"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_payment",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_CLIENT\",span_name=\"oteldemo.PaymentService/Charge\",status_code=\"STATUS_CODE_ERROR\"}[5m]))",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "0.004166666666666667"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "frontend_load",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"frontend\",span_kind=\"SPAN_KIND_SERVER\"}[5m]))",
+    "at": "2026-10-12T06:31:23Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791786683,
+          "3.8083333333333336"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "frontend_load",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"frontend\",span_kind=\"SPAN_KIND_SERVER\"}[5m]))",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "63.40833333333333"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "frontend_load",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"frontend\",span_kind=\"SPAN_KIND_SERVER\"}[5m]))",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "25.054166666666667"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_error_ratio",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m])) / sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m]))",
+    "at": "2026-10-12T06:31:23Z",
+    "result": []
+  },
+  {
+    "name": "checkout_error_ratio",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m])) / sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m]))",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "0.3119422009862701"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_error_ratio",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m])) / sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m]))",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "0.03846153846153846"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_p99",
+    "query": "histogram_quantile(0.99,sum by(le)(rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m])))",
+    "at": "2026-10-12T06:31:23Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791786683,
+          "49.6"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_p99",
+    "query": "histogram_quantile(0.99,sum by(le)(rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m])))",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "49.542857142857144"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_p99",
+    "query": "histogram_quantile(0.99,sum by(le)(rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m])))",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "49.6"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_failures_window",
+    "query": "sum(increase(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[476s]))",
+    "at": "2026-10-12T06:31:23Z",
+    "result": []
+  },
+  {
+    "name": "checkout_failures_window",
+    "query": "sum(increase(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[476s]))",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "9.634033333333333"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_failures_window",
+    "query": "sum(increase(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[476s]))",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "8.152780952380953"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_requests_window",
+    "query": "sum(increase(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[476s]))",
+    "at": "2026-10-12T06:31:23Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791786683,
+          "43.06656412722827"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_requests_window",
+    "query": "sum(increase(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[476s]))",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "45.90061365099925"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "checkout_requests_window",
+    "query": "sum(increase(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[476s]))",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "53.48611428571428"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "email_memory",
+    "query": "max(container_memory_usage_total_bytes{container_name=\"email\"})",
+    "at": "2026-10-12T06:31:23Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791786683,
+          "60928000"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "email_memory",
+    "query": "max(container_memory_usage_total_bytes{container_name=\"email\"})",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "61190144"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "email_memory",
+    "query": "max(container_memory_usage_total_bytes{container_name=\"email\"})",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "61083648"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "recommendation_memory",
+    "query": "max(container_memory_usage_total_bytes{container_name=\"recommendation\"})",
+    "at": "2026-10-12T06:31:23Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791786683,
+          "83701760"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "recommendation_memory",
+    "query": "max(container_memory_usage_total_bytes{container_name=\"recommendation\"})",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "57225216"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "recommendation_memory",
+    "query": "max(container_memory_usage_total_bytes{container_name=\"recommendation\"})",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "62681088"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "email_uptime",
+    "query": "min(container_uptime_seconds{container_name=\"email\"})",
+    "at": "2026-10-12T06:31:23Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791786683,
+          "551.607307776"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "email_uptime",
+    "query": "min(container_uptime_seconds{container_name=\"email\"})",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "1181.607971235"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "email_uptime",
+    "query": "min(container_uptime_seconds{container_name=\"email\"})",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "1321.608153993"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "recommendation_uptime",
+    "query": "min(container_uptime_seconds{container_name=\"recommendation\"})",
+    "at": "2026-10-12T06:31:23Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791786683,
+          "550.930150107"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "recommendation_uptime",
+    "query": "min(container_uptime_seconds{container_name=\"recommendation\"})",
+    "at": "2026-10-12T06:42:00Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787320,
+          "1180.930813566"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "recommendation_uptime",
+    "query": "min(container_uptime_seconds{container_name=\"recommendation\"})",
+    "at": "2026-10-12T06:44:19Z",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1791787459,
+          "1320.930996324"
+        ]
+      }
+    ]
+  }
+]

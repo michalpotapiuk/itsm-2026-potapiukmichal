@@ -1,0 +1,56 @@
+[
+  {
+    "alert": "CheckoutErrorRate",
+    "window": "baseline",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m])) / sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m])) > 0.05",
+    "start": "2026-10-12T06:26:23Z",
+    "end": "2026-10-12T06:36:22Z",
+    "positive_samples": 0,
+    "first_match": null
+  },
+  {
+    "alert": "CheckoutErrorRate",
+    "window": "incident",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m])) / sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m])) > 0.05",
+    "start": "2026-10-12T06:36:23Z",
+    "end": "2026-10-12T06:44:19Z",
+    "positive_samples": 36,
+    "first_match": "2026-10-12T06:38:13+00:00"
+  },
+  {
+    "alert": "CheckoutHighLatency",
+    "window": "baseline",
+    "query": "histogram_quantile(0.99, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m]))) > 2000",
+    "start": "2026-10-12T06:26:23Z",
+    "end": "2026-10-12T06:36:22Z",
+    "positive_samples": 0,
+    "first_match": null
+  },
+  {
+    "alert": "CheckoutHighLatency",
+    "window": "incident",
+    "query": "histogram_quantile(0.99, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m]))) > 2000",
+    "start": "2026-10-12T06:36:23Z",
+    "end": "2026-10-12T06:44:19Z",
+    "positive_samples": 0,
+    "first_match": null
+  },
+  {
+    "alert": "CheckoutElevatedErrors",
+    "window": "baseline",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m])) / sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m])) > 0.02",
+    "start": "2026-10-12T06:26:23Z",
+    "end": "2026-10-12T06:36:22Z",
+    "positive_samples": 0,
+    "first_match": null
+  },
+  {
+    "alert": "CheckoutElevatedErrors",
+    "window": "incident",
+    "query": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m])) / sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m])) > 0.02",
+    "start": "2026-10-12T06:36:23Z",
+    "end": "2026-10-12T06:44:19Z",
+    "positive_samples": 37,
+    "first_match": "2026-10-12T06:38:13+00:00"
+  }
+]

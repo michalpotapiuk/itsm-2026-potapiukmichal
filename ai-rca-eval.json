@@ -1,0 +1,50 @@
+{
+  "investigator": {
+    "agent": "course agent/agent.py (recorded investigator)",
+    "model": "qwen3:4b-instruct",
+    "mcp_server": "course prom_mcp.py; recording does not state package version",
+    "transcript": "ai-rca/transcript.md"
+  },
+  "hypotheses": [
+    {
+      "id": "H1",
+      "hypothesis": "The payment service's internal \"charge\" span is failing, as evidenced by the presence of error counts in the raw data for `traces_span_metrics_calls_total{service_name=\"payment\", span_name=\"charge\", status_code=\"STATUS_CODE_ERROR\"}`.",
+      "component": "payment",
+      "predicts": "sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_INTERNAL\",span_name=\"charge\",status_code=\"STATUS_CODE_ERROR\"}[5m])) > 0.01",
+      "at": "2026-10-12T06:42:00Z",
+      "result": true,
+      "verdict": "correct",
+      "evidence": "At 06:42:00Z internal charge, payment server, checkout client and checkout server error rates each equal 0.0321134444/s. The comparison returns a vector during the fault and no vector at onset minus 300s. The payment internal span is really named charge; unlike the model, evaluation uses the recording date."
+    },
+    {
+      "id": "H2",
+      "hypothesis": "The payment service's \"charge\" span shows increasing error counts over time, indicating a failure in the core transaction processing logic, as shown in `traces_span_metrics_calls_total{service_name=\"payment\", span_name=\"charge\", status_code=\"STATUS_CODE_ERROR\"}`.",
+      "component": "payment",
+      "predicts": "sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_INTERNAL\",span_name=\"charge\",status_code=\"STATUS_CODE_ERROR\"}[5m])) > 0.01",
+      "at": "2026-10-12T06:42:00Z",
+      "result": true,
+      "verdict": "correct",
+      "evidence": "At 06:42:00Z internal charge, payment server, checkout client and checkout server error rates each equal 0.0321134444/s. The comparison returns a vector during the fault and no vector at onset minus 300s. The payment internal span is really named charge; unlike the model, evaluation uses the recording date."
+    },
+    {
+      "id": "H3",
+      "hypothesis": "The internal \"charge\" span within the payment service is failing, which likely causes downstream failures in the checkout service, as indicated by the correlation between `traces_span_metrics_calls_total{service_name=\"payment\", span_name=\"charge\", status_code=\"STATUS_CODE_ERROR\"}` and the error pattern observed in checkout's \"PaymentService/Charge\" span.",
+      "component": "payment",
+      "predicts": "(sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_INTERNAL\",span_name=\"charge\",status_code=\"STATUS_CODE_ERROR\"}[5m])) > 0.01) and on() (sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_CLIENT\",span_name=\"oteldemo.PaymentService/Charge\",status_code=\"STATUS_CODE_ERROR\"}[5m])) > 0.01)",
+      "at": "2026-10-12T06:42:00Z",
+      "result": true,
+      "verdict": "partially_correct",
+      "evidence": "At 06:42:00Z internal charge, payment server, checkout client and checkout server error rates each equal 0.0321134444/s. The comparison returns a vector during the fault and no vector at onset minus 300s. Correlated errors support propagation; metrics alone do not prove call ordering or source-code mechanism. The payment internal span is really named charge; unlike the model, evaluation uses the recording date."
+    },
+    {
+      "id": "H4",
+      "hypothesis": "The checkout service likely fails because it depends on the payment service's \"charge\" endpoint, as observed through the error pattern in `traces_span_metrics_calls_total{service_name=\"checkout\", span_name=\"PaymentService/Charge\", status_code=\"STATUS_CODE_ERROR\"}`.",
+      "component": "checkout",
+      "predicts": "(sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_CLIENT\",span_name=\"oteldemo.PaymentService/Charge\",status_code=\"STATUS_CODE_ERROR\"}[5m])) > 0.01) and on() (sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m])) > 0.01)",
+      "at": "2026-10-12T06:42:00Z",
+      "result": true,
+      "verdict": "partially_correct",
+      "evidence": "At 06:42:00Z internal charge, payment server, checkout client and checkout server error rates each equal 0.0321134444/s. The comparison returns a vector during the fault and no vector at onset minus 300s. Correlated errors support propagation; metrics alone do not prove call ordering or source-code mechanism. The model abbreviates the checkout span as PaymentService/Charge; the actual observed label is oteldemo.PaymentService/Charge, used in this prediction."
+    }
+  ]
+}

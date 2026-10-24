@@ -1,0 +1,40 @@
+{
+  "investigator": {
+    "agent": "Codex desktop, direct Prometheus HTTP investigation",
+    "model": "GPT-6",
+    "mcp_server": "not used; read-only Prometheus /api/v1/query via Python urllib",
+    "transcript": "ai-rca/second/transcript.md"
+  },
+  "hypotheses": [
+    {
+      "id": "S1",
+      "hypothesis": "Payment is failing inside its charge operation, and payment server errors rise with it.",
+      "component": "payment",
+      "predicts": "(sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_INTERNAL\",span_name=\"charge\",status_code=\"STATUS_CODE_ERROR\"}[5m])) > 0.01) and on() (sum(rate(traces_span_metrics_calls_total{service_name=\"payment\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m])) > 0.01)",
+      "at": "2026-10-12T06:42:00Z",
+      "result": true,
+      "verdict": "correct",
+      "evidence": "Incident: [{\"metric\": {}, \"value\": [1791787320, \"0.032113444444444444\"]}]; baseline: []."
+    },
+    {
+      "id": "S2",
+      "hypothesis": "Frontend server request volume is abnormally high relative to the healthy baseline, consistent with a homepage traffic flood.",
+      "component": "frontend",
+      "predicts": "sum(rate(traces_span_metrics_calls_total{service_name=\"frontend\",span_kind=\"SPAN_KIND_SERVER\"}[5m])) > 30",
+      "at": "2026-10-12T06:42:00Z",
+      "result": true,
+      "verdict": "correct",
+      "evidence": "Incident: [{\"metric\": {}, \"value\": [1791787320, \"63.40833333333333\"]}]; baseline: []."
+    },
+    {
+      "id": "S3",
+      "hypothesis": "Checkout is experiencing a material error-rate incident, with more than ten percent of server calls failing.",
+      "component": "checkout",
+      "predicts": "sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\",status_code=\"STATUS_CODE_ERROR\"}[5m])) / sum(rate(traces_span_metrics_calls_total{service_name=\"checkout\",span_kind=\"SPAN_KIND_SERVER\"}[5m])) > 0.10",
+      "at": "2026-10-12T06:42:00Z",
+      "result": true,
+      "verdict": "correct",
+      "evidence": "Incident: [{\"metric\": {}, \"value\": [1791787320, \"0.3119422009862701\"]}]; baseline: []."
+    }
+  ]
+}

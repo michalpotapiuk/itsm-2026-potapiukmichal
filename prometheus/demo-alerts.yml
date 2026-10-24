@@ -1,0 +1,37 @@
+# ai-generated: 100% - Codex drafted symptom rules using the course metric specification and checked them on the assigned recording.
+groups:
+  - name: shop-symptoms
+    rules:
+      - alert: CheckoutErrorRate
+        expr: |
+          sum(rate(traces_span_metrics_calls_total{service_name="checkout",span_kind="SPAN_KIND_SERVER",status_code="STATUS_CODE_ERROR"}[5m]))
+          / sum(rate(traces_span_metrics_calls_total{service_name="checkout",span_kind="SPAN_KIND_SERVER"}[5m])) > 0.05
+        for: 1m
+        keep_firing_for: 1m
+        labels:
+          service: checkout
+          severity: P1
+        annotations:
+          summary: "More than 5% of checkout requests fail over five minutes"
+          description: "Check payment and catalog server errors before rolling back implicated flags."
+      - alert: CheckoutHighLatency
+        expr: |
+          histogram_quantile(0.99, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name="checkout",span_kind="SPAN_KIND_SERVER"}[5m]))) > 2000
+        for: 1m
+        keep_firing_for: 1m
+        labels:
+          service: checkout
+          severity: P1
+        annotations:
+          summary: "Checkout p99 exceeds 2000 milliseconds over five minutes"
+          description: "Check shipping and catalog latency, and resource pressure in dependent services."
+      - alert: CheckoutElevatedErrors
+        expr: |
+          sum(rate(traces_span_metrics_calls_total{service_name="checkout",span_kind="SPAN_KIND_SERVER",status_code="STATUS_CODE_ERROR"}[5m]))
+          / sum(rate(traces_span_metrics_calls_total{service_name="checkout",span_kind="SPAN_KIND_SERVER"}[5m])) > 0.02
+        for: 1m
+        labels:
+          service: checkout
+          severity: P2
+        annotations:
+          summary: "More than 2% of checkout requests fail"
